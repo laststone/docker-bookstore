@@ -1,0 +1,28 @@
+version: '2'
+services:
+  db:
+      build: ./mysql
+      ports:
+        - "3306:3306"
+      volumes:
+        - ../data/mysql:/var/lib/mysql:rw
+        - ../logs/mysql:/var/lib/mysql-logs:rw
+        - ./mysql/conf.d:/etc/mysql/conf.d:ro
+      environment:
+        MYSQL_ROOT_PASSWORD: mysql
+        MYSQL_DATABASE: bookstore
+        MYSQL_USER: zhangsan
+        MYSQL_PASSWORD: 654321
+      restart: always
+      command: "--character-set-server=utf8"
+  web:
+    build: ./bookstore
+    command: ["./run_web.sh"]
+    volumes:
+      - .:/webapps
+    ports:
+      - "8000:8000"
+    links:
+      - db
+    depends_on:
+      - db
